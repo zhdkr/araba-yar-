@@ -35,6 +35,28 @@ game_mode = 'edite'
 game_state = 'serbest'
 
 
+# Araba sınıfı
+class araba:
+    def __init__(self, merkezx, merkezy):
+        aci1 = 148
+        aci2 = 212
+        aci3 = 328
+        aci4 = 32
+        self.a = merkezx + (23.58 * math.cos(math.radians(aci1 + aci)))
+        self.b = merkezy + (23.58 * math.sin(math.radians(aci1 + aci)))
+        self.c = merkezx + (23.58 * math.cos(math.radians(aci2 + aci)))
+        self.d = merkezy + (23.58 * math.sin(math.radians(aci2 + aci)))
+        self.e = merkezx + (23.58 * math.cos(math.radians(aci3 + aci)))
+        self.f = merkezy + (23.58 * math.sin(math.radians(aci3 + aci)))
+        self.g = merkezx + (23.58 * math.cos(math.radians(aci4 + aci)))
+        self.h = merkezy + (23.58 * math.sin(math.radians(aci4 + aci)))
+
+    def Araba_koy(self):
+        pygame.draw.line(screen, kirmizi, (self.a, self.b), (self.c, self.d), 3)
+        pygame.draw.line(screen, kirmizi, (self.c, self.d), (self.e, self.f), 3)
+        pygame.draw.line(screen, kirmizi, (self.e, self.f), (self.g, self.h), 3)
+        pygame.draw.line(screen, kirmizi, (self.g, self.h), (self.a, self.b), 3)
+
 # Araba Değerleri
 araba_koordinati = 0
 merkezX = 1000
@@ -44,63 +66,98 @@ aci = 0
 arabaX_degisimi = hiz*math.cos(math.radians(aci))
 arabaY_degisimi = hiz*math.sin(math.radians(aci))
 
-# Yol ile ilgili parametreler
+# Button ve bilgilendirici yazı sınıfı
+class button:
+
+    def __init__(self, konumx, konumy, buyuklukx, buyukluky, yazi ):
+        self.b = konumx
+        self.c = konumy
+        self.d = buyuklukx
+        self.e = buyukluky
+        self.f = yazi
+
+    def button_olustur(self):
+        pygame.draw.line(screen, gumus, (self.b, self.c), (self.b + self.d, self.c), 3)
+        pygame.draw.line(screen, gumus, (self.b + self.d, self.c), (self.b + self.d, self.c + self.e), 3)
+        pygame.draw.line(screen, gumus, (self.b + self.d, self.c + self.e), (self.b, self.c + self.e), 3)
+        pygame.draw.line(screen, gumus, (self.b, self.c + self.e), (self.b, self.c), 3)
+        button_yazi_font = pygame.font.SysFont('Arial', 15)
+        button_yazi = button_yazi_font.render(self.f, True, siyah)
+        screen.blit(button_yazi, (self.b + 20, self.c + 10))
+
+    def buttona_araba_koy(self):
+        pygame.draw.line(screen, kirmizi, (self.b + 50, self.c + 45), (self.b + 100, self.c + 45), 3)
+        pygame.draw.line(screen, kirmizi, (self.b + 100, self.c + 45), (self.b + 100, self.c + 75), 3)
+        pygame.draw.line(screen, kirmizi, (self.b + 100, self.c + 75), (self.b + 50, self.c + 75), 3)
+        pygame.draw.line(screen, kirmizi, (self.b + 50, self.c + 75), (self.b + 50, self.c + 45), 3)
+
+    def buttona_yol_koy(self):
+        pygame.draw.line(screen, mavi, (self.b + 20, self.c + 80), (self.b + 130, self.c + 30), 3)
+        pygame.draw.circle(screen, kirmizi, (self.b + 20, self.c + 80), 3)
+        pygame.draw.circle(screen, kirmizi, (self.b + 130, self.c + 30), 3)
+        pygame.draw.circle(screen, kirmizi, (self.b + 75, self.c + 55), 3)
+
+
+
+
+
+# Yol sınıfı
+
+yolX_bit = 0
+yolY_bit = 0
 yol = []
+b = 0
 yolX_baslangic = []
 yolY_baslangic = []
 yolX_bitis = []
 yolY_bitis = []
-yolX_bit = 0
-yolY_bit = 0
-yol_sayisi = 0
+class Yol:
 
-# Araba koyma ve Yer değiştirme fonksiyonu
-def Araba_koy(merkezx, merkezy):
-    aci1 = 148
-    aci2 = 212
-    aci3 = 328
-    aci4 = 32
-    a = merkezx + (23.58 * math.cos(math.radians(aci1 + aci)))
-    b = merkezy + (23.58 * math.sin(math.radians(aci1 + aci)))
-    c = merkezx + (23.58 * math.cos(math.radians(aci2 + aci)))
-    d = merkezy + (23.58 * math.sin(math.radians(aci2 + aci)))
-    e = merkezx + (23.58 * math.cos(math.radians(aci3 + aci)))
-    f = merkezy + (23.58 * math.sin(math.radians(aci3 + aci)))
-    g = merkezx + (23.58 * math.cos(math.radians(aci4 + aci)))
-    h = merkezy + (23.58 * math.sin(math.radians(aci4 + aci)))
-    pygame.draw.polygon(screen, kirmizi, [(a, b), (c, d), (e, f), (g, h)], 3)
+    # Yol ile ilgili parametreler
 
-# Yol koyma fonksiyonu
 
-def Yol_koy(x, y, z, d):
-    pygame.draw.line(screen, mavi, (x, y), (z, d), 5)
+    yol_sayisi = 0
+    def __init__(self, yol_numarasi,  yolX_baslangic, yolY_baslangic, yolX_bitis, yolY_bitis):
+        self.a = yol_numarasi
+        self.x = yolX_baslangic
+        self.y = yolY_baslangic
+        self.z = yolX_bitis
+        self.d = yolY_bitis
+    yol_sayisi += 1
 
-def Daire_koy(x, y):
-    pygame.draw.circle(screen, kirmizi, (x, y), 5)
 
-# Yol silme fonksiyonu
-def yol_uzaklik(a, x, y):
-    b = 1000
-    # 1. bölge
-    if (yolX_baslangic[a] < yolX_bitis[a]) and (yolY_baslangic[a] < yolY_bitis[a]):
-        if (yolX_baslangic[a] <= mouse[0] <= yolX_bitis[a]) and (yolY_baslangic[a] <= mouse[1] <= yolY_bitis[a]):
-            b = 1
-    # 2. bölge
-    if (yolX_baslangic[a] > yolX_bitis[a]) and (yolY_baslangic[a] < yolY_bitis[a]):
-        if (yolX_bitis[a] <= mouse[0] <= yolX_baslangic[a]) and (yolY_baslangic[a] <= mouse[1] <= yolY_bitis[a]):
-            b = 1
-    # 3. bölge
-    if (yolX_baslangic[a] > yolX_bitis[a]) and (yolY_baslangic[a] > yolY_bitis[a]):
-        if (yolX_bitis[a] <= mouse[0] <= yolX_baslangic[a]) and (yolY_bitis[a] <= mouse[1] <= yolY_baslangic[a]):
-            b = 1
-    # 4. bölge
-    if (yolX_baslangic[a] < yolX_bitis[a]) and (yolY_baslangic[a] > yolY_bitis[a]):
-        if (yolX_baslangic[a] <= mouse[0] <= yolX_bitis[a]) and (yolY_bitis[a] <= mouse[1] <= yolY_baslangic[a]):
-            b = 1
-    m = (yolY_bitis[a] * 1.000001 - yolY_baslangic[a]) / (yolX_bitis[a] * 1.000001 - yolX_baslangic[a])
-    c = yolY_bitis[a] - m * yolX_bitis[a]
-    uzaklik = b*abs((y - m * x - c) / math.sqrt(1 + m * m))
-    return uzaklik
+    # Yol koyma fonksiyonu
+    def Yol_koy(self):
+        pygame.draw.line(screen, mavi, (self.x, self.y), (self.z, self.d), 5)
+        pygame.draw.circle(screen, kirmizi, (self.x, self.y), 5)
+        pygame.draw.circle(screen, kirmizi, (self.z, self.d), 5)
+        pygame.draw.circle(screen, kirmizi, ((self.x + self.z)/2, (self.y + self.d)/2), 5)
+
+    # Yol silme fonksiyonu (uzaklık hesabı ile)
+    def yol_uzaklik(self, g, h):
+        b = 1000
+        # 1. bölge
+        if (self.x < self.z) and (self.y < self.d):
+            if (self.x <= mouse[0] <= self.z) and (self.y <= mouse[1] <= self.d):
+                b = 1
+        # 2. bölge
+        if (self.x > self.z) and (self.y < self.d):
+            if (self.z <= mouse[0] <= self.x) and (self.y <= mouse[1] <= self.d):
+                b = 1
+        # 3. bölge
+        if (self.x > self.z) and (self.y > self.d):
+            if (self.z <= mouse[0] <= self.x) and (self.d <= mouse[1] <= self.y):
+                b = 1
+        # 4. bölge
+        if (self.x < self.z) and (self.y > self.d):
+            if (self.x <= mouse[0] <= self.z) and (self.d <= mouse[1] <= self.y):
+                b = 1
+        m = (self.d * 1.000001 - self.y) / (self.z * 1.000001 - self.x)
+        c = self.d - m * self.z
+        uzaklik = b * abs((h - m * g - c) / math.sqrt(1 + m * m))
+        return uzaklik
+
+
 
 
 
@@ -129,21 +186,15 @@ while running:
         screen.blit (bilgilendirme_yazisi1, (20, 550))
 
         # Araba Koyma Butonu
-        pygame.draw.rect(screen, gumus, [640, 10, 150, 100])
-        araba_button_yazi_font = pygame.font.SysFont('Arial', 15)
-        araba_button_yazi = araba_button_yazi_font.render('Araba', True, siyah)
-        screen.blit(araba_button_yazi, (660, 20))
-        pygame.draw.rect(screen, kirmizi, (690, 55, 50, 30), 3)
+        araba_button = button(640, 10, 150, 100, 'ARABA')
+        araba_button.button_olustur()
+        araba_button.buttona_araba_koy()
 
         # Yol Koyma Butonu
-        pygame.draw.rect(screen, gumus, [480, 10, 150, 100])
-        yol_button_yazi_font = pygame.font.SysFont('Arial', 15)
-        yol_button_yazi = yol_button_yazi_font.render('Yol', True, siyah)
-        screen.blit(yol_button_yazi, (510, 20))
-        pygame.draw.aaline(screen, mavi, (500, 90), (610, 40), 50)
-        pygame.draw.circle(screen, kirmizi, (500, 90), 3)
-        pygame.draw.circle(screen, kirmizi, (610, 40), 3)
-        pygame.draw.circle(screen, kirmizi, (555, 65), 3)
+        yol_button = button(480, 10, 150, 100, 'YOL')
+        yol_button.button_olustur()
+        yol_button.buttona_yol_koy()
+
 
         # Edit modunda Klavye ve Fare kullanıldığında gerçekleşen olaylar
         for event in pygame.event.get():
@@ -162,23 +213,10 @@ while running:
 
                     # Araba koyma butonuna tıklanılması
                     if (640 <= mouse[0] <= 790) and (10 <= mouse[1] <= 110):
-                        pygame.draw.rect(screen, mavi, [640, 10, 150, 100])
-                        araba_button_yazi_font = pygame.font.SysFont('Arial', 15)
-                        araba_button_yazi = araba_button_yazi_font.render('Araba', True, kirmizi)
-                        screen.blit(araba_button_yazi, (660, 20))
-                        pygame.draw.rect(screen, yesil, (690, 55, 50, 30), 1)
                         game_state = 'araba koyma'
 
                     # Yol koyma butonuna tıklanılması
                     elif (480 <= mouse[0] <= 630) and (10 <= mouse[1] <= 110):
-                        pygame.draw.rect(screen, mavi, [480, 10, 150, 100])
-                        yol_button_yazi_font = pygame.font.SysFont('Arial', 15)
-                        yol_button_yazi = yol_button_yazi_font.render('Yol', True, kirmizi)
-                        screen.blit(yol_button_yazi, (510, 20))
-                        pygame.draw.aaline(screen, yesil, (500, 90), (610, 40))
-                        pygame.draw.circle(screen, gri, (500, 90), 3)
-                        pygame.draw.circle(screen, gri, (610, 40), 3)
-                        pygame.draw.circle(screen, gri, (555, 65), 3)
                         game_state = 'yol koyma'
 
                     # Arabayı koymak istediğimiz lokasyon
@@ -188,15 +226,15 @@ while running:
 
                     # İstediğimiz kadar yolu istediğimiz yerlerde oluşturmak
                     elif game_state == 'yol koyma 2':
-                        yol_sayisi += 1
-                        yolX_baslangic.append(yolX_bit)
-                        yolY_baslangic.append(yolY_bit)
-                        yolX_bitis.append(mouse[0])
-                        yolY_bitis.append(mouse[1])
+                        yol[b-1] = Yol(b-1, yolX_bit, yolY_bit, mouse[0], mouse[1])
                         game_state = 'yol koyma 3'
+
+
 
                     # Yolun başlangıcını belirlemek
                     elif game_state == 'yol koyma' or game_state == 'yol koyma 3':
+                        yol.append(Yol(b, yolX_bit, yolY_bit, mouse[0], mouse[1]))
+                        b += 1
                         yolX_bit = mouse[0]
                         yolY_bit = mouse[1]
                         game_state = 'yol koyma 2'
@@ -211,12 +249,10 @@ while running:
 
                     # Yol silme
                     else:
-                        for i in range(yol_sayisi):
-                            if (yol_uzaklik(i, mouse[0], mouse[1]) <= 20):
-                                yolX_baslangic[i] = 1000
-                                yolY_baslangic[i] = 999
-                                yolX_bitis[i] = 900
-                                yolY_bitis[i] = 1001
+                        for i in range(b):
+                            if (yol[i].yol_uzaklik(mouse[0], mouse[1]) <= 20):
+                                yol[i] = Yol(i, 1000, 999, 900, 1001)
+
 
 
             # Run moduna geçme
@@ -293,17 +329,14 @@ while running:
 
     if game_state == 'yol koyma 2':
         mouse2 = pygame.mouse.get_pos()
-        Yol_koy(yolX_bit, yolY_bit, mouse2[0], mouse2[1])
-        Daire_koy(yolX_bit, yolY_bit)
-        Daire_koy(mouse2[0], mouse2[1])
-        Daire_koy((yolX_bit + mouse2[0])/2, (yolY_bit + mouse2[1])/2)
+        yol[b-1] = Yol(b-1, yolX_bit, yolY_bit, mouse2[0], mouse2[1])
+        yol[b-1].Yol_koy()
 
-    if game_state == 'yol koyma 3' or game_state == 'araba koyma' or 'yol koyma 2':
-        for j in range(yol_sayisi):
-            Yol_koy(yolX_baslangic[j], yolY_baslangic[j], yolX_bitis[j], yolY_bitis[j])
-            Daire_koy(yolX_baslangic[j], yolY_baslangic[j])
-            Daire_koy(yolX_bitis[j], yolY_bitis[j])
-            Daire_koy((yolX_baslangic[j] + yolX_bitis[j])/2, (yolY_baslangic[j] + yolY_bitis[j])/2)
+
+    if game_state == 'yol koyma 3' or game_state == 'araba koyma' or game_state == 'yol koyma 2':
+            for j in range(b):
+                yol[j].Yol_koy()
+
             # print(yol_uzaklik(j, 0, 0))
 
     # Araba çizdirme
@@ -323,7 +356,9 @@ while running:
         merkezY = 587.5
     elif (merkezY < 12.5):
         merkezY = 12.5
-    Araba_koy(merkezX, merkezY)
+
+    araba_konumu = araba(merkezX, merkezY)
+    araba_konumu.Araba_koy()
 
     # Ekranı sürekli günceller
     pygame.display.update()
